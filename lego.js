@@ -5,6 +5,15 @@
  * Реализованы методы or и and
  */
 exports.isStar = false;
+var FUNCTION_PRIORITY = [
+    'add',
+    'or',
+    'filterIn',
+    'sortBy',
+    'select',
+    'format',
+    'limit'
+];
 
 /**
  * Запрос к коллекции
@@ -16,7 +25,9 @@ exports.query = function (collection) {
     var fiendsList = collection ? collection.slice() : [];
     [].slice.call(arguments, 1)
     .sort(function (a, b) {
-        return compare(a.name, b.name);
+        return compare(
+            FUNCTION_PRIORITY.indexOf(a.name), FUNCTION_PRIORITY.indexOf(b.name)
+        );
     })
     .forEach(function (func) {
         fiendsList = func(fiendsList);
@@ -33,7 +44,7 @@ exports.query = function (collection) {
 exports.select = function () {
     var args = [].slice.call(arguments);
 
-    return function func3(collection) {
+    return function select(collection) {
         return collection.map(function (item) {
             return args.filter(function (arg) {
                 return isKey(item, arg);
@@ -54,9 +65,11 @@ exports.select = function () {
  * @returns {Function}
  */
 exports.filterIn = function (property, values) {
-    return function func1(collection) {
+    return function filterIn(collection) {
         return collection.filter(function (item) {
-            return values.indexOf(item[property]) !== -1;
+            return values.some(function (value) {
+                return item[property] === value;
+            });
         });
     };
 };
@@ -68,14 +81,12 @@ exports.filterIn = function (property, values) {
  * @returns {Function}
  */
 exports.sortBy = function (property, order) {
-    return function func2(collection) {
-        if (order === 'asc') {
-            return collection.sort(function (a, b) {
-                return compare(a[property], b[property]);
-            });
-        }
-
+    return function sortBy(collection) {
         return collection.sort(function (a, b) {
+            if (order === 'asc') {
+                return compare(a[property], b[property]);
+            }
+
             return compare(b[property], a[property]);
         });
     };
@@ -88,7 +99,7 @@ exports.sortBy = function (property, order) {
  * @returns {Function}
  */
 exports.format = function (property, formatter) {
-    return function func4(collection) {
+    return function format(collection) {
         return collection.map(function (item) {
             if (isKey(item, property)) {
                 item[property] = formatter(item[property]);
@@ -105,7 +116,7 @@ exports.format = function (property, formatter) {
  * @returns {Function}
  */
 exports.limit = function (count) {
-    return function func5(collection) {
+    return function limit(collection) {
         return collection.slice(0, count);
     };
 };
@@ -121,7 +132,7 @@ if (exports.isStar) {
     exports.or = function () {
         var functions = [].slice.call(arguments);
 
-        return function func0(collection) {
+        return function or(collection) {
             var filtredCollection = [];
             functions.forEach(function (func) {
                 filtredCollection = filtredCollection.concat(func(collection));
@@ -140,7 +151,7 @@ if (exports.isStar) {
     exports.and = function () {
         var functions = [].slice.call(arguments);
 
-        return function func0(collection) {
+        return function and(collection) {
             var filtredCollection = collection.slice();
             functions.forEach(function (func) {
                 filtredCollection = func(filtredCollection);
@@ -161,9 +172,5 @@ function compare(a, b) {
     return 0;
 }
 function isKey(obj, key) {
-    if (Object.keys(obj).indexOf(key) !== -1) {
-        return true;
-    }
-
-    return false;
+    return Object.keys(obj).indexOf(key) !== -1;
 }
