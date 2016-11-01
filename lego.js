@@ -4,7 +4,7 @@
  * Сделано задание на звездочку
  * Реализованы методы or и and
  */
-exports.isStar = true;
+exports.isStar = false;
 
 /**
  * Запрос к коллекции
@@ -13,15 +13,12 @@ exports.isStar = true;
  * @returns {Array}
  */
 exports.query = function (collection) {
-    var fiendsList = collection.slice() || [];
-    var args = [].slice.call(arguments)
-        .filter(function (arg) {
-            return typeof arg === 'function';
-        })
-        .sort(function (a, b) {
-            return compare(a.name, b.name);
-        });
-    args.forEach(function (func) {
+    var fiendsList = collection ? collection.slice() : [];
+    [].slice.call(arguments, 1)
+    .sort(function (a, b) {
+        return compare(a.name, b.name);
+    })
+    .forEach(function (func) {
         fiendsList = func(fiendsList);
     });
 
@@ -38,11 +35,10 @@ exports.select = function () {
 
     return function func3(collection) {
         return collection.map(function (item) {
-            var filetredArgs = args.filter(function (arg) {
+            return args.filter(function (arg) {
                 return isKey(item, arg);
-            });
-
-            return filetredArgs.reduce(function (acc, arg) {
+            })
+            .reduce(function (acc, arg) {
                 acc[arg] = item[arg];
 
                 return acc;
@@ -59,16 +55,11 @@ exports.select = function () {
  */
 exports.filterIn = function (property, values) {
     return function func1(collection) {
-        if (!isKey(collection[0], property)) {
-            return collection;
-        }
-        var filtredCollection = collection.filter(function (item) {
+        return collection.filter(function (item) {
             return values.some(function (value) {
                 return item[property] === value;
             });
         });
-
-        return filtredCollection;
     };
 };
 
@@ -80,9 +71,6 @@ exports.filterIn = function (property, values) {
  */
 exports.sortBy = function (property, order) {
     return function func2(collection) {
-        if (!isKey(collection[0], property)) {
-            return collection;
-        }
         if (order === 'asc') {
             return collection.sort(function (a, b) {
                 return compare(a[property], b[property]);
