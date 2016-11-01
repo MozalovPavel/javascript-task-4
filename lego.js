@@ -22,7 +22,8 @@ var FUNCTION_PRIORITY = [
  * @returns {Array}
  */
 exports.query = function (collection) {
-    var fiendsList = collection.slice();
+    // var fiendsList = collection.slice();
+    var fiendsList = JSON.parse(JSON.stringify(collection));
     [].slice.call(arguments, 1)
     .sort(function (a, b) {
         return compare(
@@ -67,10 +68,9 @@ exports.select = function () {
 exports.filterIn = function (property, values) {
     return function filterIn(collection) {
         return collection.filter(function (item) {
-            return values.indexOf(item[property]) !== -1;
-            // return values.some(function (value) {
-                // return item[property] !== -1;
-            // });
+            return values.some(function (value) {
+                return item[property] === value;
+            });
         });
     };
 };
