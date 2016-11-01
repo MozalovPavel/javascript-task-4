@@ -149,7 +149,7 @@ if (exports.isStar) {
     exports.and = function () {
         var functions = [].slice.call(arguments);
 
-        return function add(collection) {
+        return function and(collection) {
             return functions.reduce(function (acc, func) {
                 return func(acc);
             }, collection);
