@@ -134,12 +134,9 @@ if (exports.isStar) {
         var functions = [].slice.call(arguments);
 
         return function or(collection) {
-            var filtredCollection = [];
-            functions.forEach(function (func) {
-                filtredCollection = filtredCollection.concat(func(collection));
-            });
-
-            return filtredCollection;
+            return functions.reduce(function (acc, func) {
+                return acc.concat(func(collection));
+            }, []);
         };
     };
 
@@ -152,13 +149,10 @@ if (exports.isStar) {
     exports.and = function () {
         var functions = [].slice.call(arguments);
 
-        return function and(collection) {
-            var filtredCollection = collection.slice();
-            functions.forEach(function (func) {
-                filtredCollection = func(filtredCollection);
-            });
-
-            return filtredCollection;
+        return function add(collection) {
+            return functions.reduce(function (acc, func) {
+                return func(acc);
+            }, collection);
         };
     };
 }
