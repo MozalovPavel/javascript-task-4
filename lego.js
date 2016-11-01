@@ -134,9 +134,11 @@ if (exports.isStar) {
         var functions = [].slice.call(arguments);
 
         return function or(collection) {
-            return functions.reduce(function (acc, func) {
-                return acc.concat(func(collection));
-            }, []);
+            return collection.filter(function (item) {
+                return functions.some(function (func) {
+                    return func(collection).indexOf(item) !== -1;
+                });
+            });
         };
     };
 
