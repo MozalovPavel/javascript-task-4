@@ -26,8 +26,8 @@ exports.query = function (collection) {
     var fiendsList = JSON.parse(JSON.stringify(collection));
     [].slice.call(arguments, 1)
     .sort(function (a, b) {
-        return Math.sign(
-            FUNCTION_PRIORITY.indexOf(a.name) - FUNCTION_PRIORITY.indexOf(b.name)
+        return compare(
+            FUNCTION_PRIORITY.indexOf(a.name), FUNCTION_PRIORITY.indexOf(b.name)
         );
     })
     .forEach(function (func) {
@@ -85,10 +85,10 @@ exports.sortBy = function (property, order) {
     return function sortBy(collection) {
         return collection.sort(function (a, b) {
             if (order === 'asc') {
-                return Math.sign(a[property] - b[property]);
+                return compare(a[property], b[property]);
             }
 
-            return Math.sign(b[property] - a[property]);
+            return compare(b[property], a[property]);
         });
     };
 };
@@ -158,16 +158,9 @@ if (exports.isStar) {
         };
     };
 }
-// function compare(a, b) {
-//     if (a > b) {
-//         return 1;
-//     }
-//     if (a < b) {
-//         return -1;
-//     }
-//
-//     return 0;
-// }
+function compare(a, b) {
+    return Math.sign(a - b);
+}
 function isKey(obj, key) {
     return Object.keys(obj).indexOf(key) !== -1;
 }
