@@ -164,3 +164,5 @@ function compare(a, b) {
 function isKey(obj, key) {
     return Object.keys(obj).indexOf(key) !== -1;
 }
+
+//test string 
