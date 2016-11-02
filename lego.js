@@ -159,12 +159,15 @@ if (exports.isStar) {
     };
 }
 function compare(a, b) {
-    return Math.sign(a - b);
+    if (a > b) {
+        return 1;
+    }
+    if (a < b) {
+        return -1;
+    }
+
+    return 0;
 }
 function isKey(obj, key) {
     return Object.keys(obj).indexOf(key) !== -1;
 }
-
-/**
-  * test string
-*/
