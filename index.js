@@ -85,7 +85,7 @@ var bestFriends = lego.query(
     lego.limit(4)
 );
 
-console.info(bestFriends);
+// console.info(bestFriends);
 
 /* Выведет:
 [

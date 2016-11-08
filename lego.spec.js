@@ -83,6 +83,106 @@ describe('lego.query', function () {
             { name: 'Сэм', gender: 'М', email: 'luisazamora@example.com' }
         ]);
     });
+    it('Проверка если передаем только колекцию', function () {
+        var result = lego.query(
+            friends
+        );
+
+        assert.deepStrictEqual(result, friends);
+    });
+    it('Игнор несущ. полей', function () {
+        var result = lego.query(
+            friends,
+            lego.select('asdff', 'name', 'gender', 'email', 'asdq'),
+            lego.filterIn('favoriteFruit', ['Яблоко', 'Картофель']),
+            lego.sortBy('age', 'asc'),
+            lego.format('gender', function (value) {
+                return value[0];
+            }),
+            lego.limit(4)
+        );
+
+        assert.deepStrictEqual(result, [
+            { name: 'Стелла', gender: 'Ж', email: 'waltersguzman@example.com' },
+            { name: 'Мэт', gender: 'М', email: 'danamcgee@example.com' },
+            { name: 'Шерри', gender: 'Ж', email: 'danamcgee@example.com' },
+            { name: 'Сэм', gender: 'М', email: 'luisazamora@example.com' }
+        ]);
+    });
+    it('Несколько вызовов select', function () {
+        var result = lego.query(
+            friends,
+            lego.select('asdff', 'name', 'asdq'),
+            lego.select('asdff', 'name', 'gender', 'email', 'asdq'),
+            lego.filterIn('favoriteFruit', ['Яблоко', 'Картофель']),
+            lego.sortBy('age', 'asc'),
+            lego.format('gender', function (value) {
+                return value[0];
+            }),
+            lego.limit(4)
+        );
+
+        assert.deepStrictEqual(result, [
+            { name: 'Стелла' },
+            { name: 'Мэт' },
+            { name: 'Шерри' },
+            { name: 'Сэм' }
+        ]);
+    });
+    it('Некорректный параметр для sortBy', function () {
+        var result = lego.query(
+            friends,
+            lego.select('name'),
+            lego.filterIn('favoriteFruit', ['Яблоко', 'Картофель']),
+            lego.sortBy('asd', 'asc'),
+            // lego.format('gender', function (value) {
+            //     return value[0];
+            // }),
+            lego.limit(4)
+        );
+
+        assert.deepStrictEqual(result, [
+            { name: 'Сэм' },
+            { name: 'Эмили' },
+            { name: 'Мэт' },
+            { name: 'Шерри' }
+        ]);
+    });
+    // it('Некорректный параметр filterIn', function () {
+    //     var result = lego.query(
+    //         friends,
+    //         lego.select('name'),
+    //         lego.filterIn('asd', ['Яблоко', 'Картофель']),
+    //         lego.limit(4)
+    //     );
+    //
+    //     assert.deepStrictEqual(result, [
+    //         { name: 'Сэм' },
+    //         { name: 'Эмили' },
+    //         { name: 'Мэт' },
+    //         { name: 'Брэд' }
+    //     ]);
+    // });
+    it('Пустой query', function () {
+        var result = lego.query();
+
+        assert.deepStrictEqual(result, []);
+    });
+    it('Сортировка в обратном порядке', function () {
+        var result = lego.query(
+            friends,
+            lego.select('name', 'age'),
+            lego.sortBy('age', 'desc'),
+            lego.limit(4)
+        );
+
+        assert.deepStrictEqual(result, [
+            { name: 'Керри', age: 36 },
+            { name: 'Эмили', age: 30 },
+            { name: 'Сэм', age: 29 },
+            { name: 'Брэд', age: 28 }
+        ]);
+    });
 
     if (lego.isStar) {
         it('должен поддерживать операторы or и and', function () {

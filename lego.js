@@ -22,19 +22,17 @@ var FUNCTION_PRIORITY = [
  * @returns {Array}
  */
 exports.query = function (collection) {
-    // var fiendsList = collection.slice();
-    var fiendsList = JSON.parse(JSON.stringify(collection));
-    [].slice.call(arguments, 1)
+    var fiendsList = collection ? collection.slice() : [];
+
+    return [].slice.call(arguments, 1)
     .sort(function (a, b) {
         return compare(
             FUNCTION_PRIORITY.indexOf(a.name), FUNCTION_PRIORITY.indexOf(b.name)
         );
     })
-    .forEach(function (func) {
-        fiendsList = func(fiendsList);
-    });
-
-    return fiendsList;
+    .reduce(function (acc, func) {
+        return func(acc);
+    }, fiendsList);
 };
 
 /**
@@ -43,15 +41,15 @@ exports.query = function (collection) {
  * @returns {Function}
  */
 exports.select = function () {
-    var args = [].slice.call(arguments);
+    var propertys = [].slice.call(arguments);
 
     return function select(collection) {
         return collection.map(function (item) {
-            return args.filter(function (arg) {
-                return isKey(item, arg);
+            return propertys.filter(function (property) {
+                return item.hasOwnProperty(property);
             })
-            .reduce(function (acc, arg) {
-                acc[arg] = item[arg];
+            .reduce(function (acc, property) {
+                acc[property] = item[property];
 
                 return acc;
             }, {});
@@ -68,9 +66,7 @@ exports.select = function () {
 exports.filterIn = function (property, values) {
     return function filterIn(collection) {
         return collection.filter(function (item) {
-            return values.some(function (value) {
-                return item[property] === value;
-            });
+            return values.indexOf(item[property]) !== -1;
         });
     };
 };
@@ -102,7 +98,7 @@ exports.sortBy = function (property, order) {
 exports.format = function (property, formatter) {
     return function format(collection) {
         return collection.map(function (item) {
-            if (isKey(item, property)) {
+            if (item.hasOwnProperty(property)) {
                 item[property] = formatter(item[property]);
             }
 
@@ -167,7 +163,4 @@ function compare(a, b) {
     }
 
     return 0;
-}
-function isKey(obj, key) {
-    return Object.keys(obj).indexOf(key) !== -1;
 }
