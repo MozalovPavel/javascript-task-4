@@ -23,7 +23,7 @@ var FUNCTION_PRIORITY = [
  */
 exports.query = function (collection) {
     var fiendsList = collection.map(function (item) {
-        return Object.assign({}, item);
+        return clone(item);
     });
 
     return [].slice.call(arguments, 1)
@@ -165,4 +165,12 @@ function compare(a, b) {
     }
 
     return 0;
+}
+function clone(obj) {
+    var copy = obj.constructor();
+    Object.keys(obj).forEach(function (key) {
+        copy[key] = obj[key];
+    });
+
+    return copy;
 }
