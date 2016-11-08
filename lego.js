@@ -22,7 +22,7 @@ var FUNCTION_PRIORITY = [
  * @returns {Array}
  */
 exports.query = function (collection) {
-    var fiendsList = collection ? collection.slice() : [];
+    var fiendsList = Object.assign([], collection);
 
     return [].slice.call(arguments, 1)
     .sort(function (a, b) {
